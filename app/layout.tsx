@@ -5,6 +5,7 @@ import Sidebar from './components/Sidebar/Sidebar';
 import GlobalStyleProvider from './providers/GlobalStyleProvider';
 import ContextProvider from './providers/ContextProvider';
 import { ClerkProvider, RedirectToSignIn } from '@clerk/nextjs';
+import { auth } from '@clerk/nextjs/server';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,9 +19,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { userId } = auth();
+  console.log(userId);
+
   return (
     <ClerkProvider>
-      <RedirectToSignIn />
+      {userId ? <RedirectToSignIn /> : null}
       <html lang="en">
         <head>
           <link
@@ -34,7 +38,7 @@ export default function RootLayout({
         <body className={inter.className}>
           <ContextProvider>
             <GlobalStyleProvider>
-              <Sidebar />
+              {userId && <Sidebar />}
               <div className="w-full">{children}</div>
             </GlobalStyleProvider>
           </ContextProvider>
