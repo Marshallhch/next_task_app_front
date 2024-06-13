@@ -1,8 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useAuth } from '@clerk/nextjs';
+
+import { postTasks } from '../../redux/slices/apiSlice';
+import { Dispatch } from 'redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const CreateContent = () => {
   const [title, setTitle] = useState('');
@@ -11,6 +15,9 @@ const CreateContent = () => {
   const [completed, setCompleted] = useState(false);
   const [important, setImportant] = useState(false);
   const { userId } = useAuth();
+
+  const dispatch: Dispatch<any> = useDispatch(); // Explicitly type the dispatch function with 'Dispatch<any>'
+  const taskData = useSelector((item: any) => item.apis.postTasksData);
 
   const handleChange = (name: string) => (e: any) => {
     switch (name) {
@@ -40,6 +47,21 @@ const CreateContent = () => {
       return;
     }
 
+    if (!title) {
+      toast.error('Title is required');
+      return;
+    }
+
+    if (!description) {
+      toast.error('Description is required');
+      return;
+    }
+
+    if (!date) {
+      toast.error('Date is required');
+      return;
+    }
+
     const task = {
       title,
       description,
@@ -49,19 +71,14 @@ const CreateContent = () => {
       userId,
     };
 
-    try {
-      const response = await fetch('http://localhost:3001/tasks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(task),
-      });
-      // console.log(response);
+    const options = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(task),
+    };
 
-      toast.success('Task created successfully');
-    } catch (error) {
-      console.log('ERROR CREATING TASK: ', error);
-      toast.error('Error creating task');
-    }
+    // @ts-ignore
+    dispatch(postTasks(options));
   };
 
   return (

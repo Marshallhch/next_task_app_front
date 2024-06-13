@@ -1,18 +1,30 @@
 'use client';
 
 import { useGlobalState } from '@/app/context/globalProvider';
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import CreateContent from '../Modals/CreateContent';
+import { useDispatch, useSelector } from 'react-redux';
+import { getTasks } from '../../redux/slices/apiSlice';
+
+import { Dispatch } from 'redux';
+import { useAuth } from '@clerk/nextjs';
+// import CreateContent from '../Modals/CreateContent';
 
 const Tasks = () => {
   const { theme } = useGlobalState();
+  const dispatch: Dispatch<any> = useDispatch(); // Explicitly type the dispatch function with 'Dispatch<any>'
+  const taskData = useSelector((item: any) => item.apis.getTasksData);
 
-  return (
-    <TaskStyled theme={theme}>
-      <CreateContent />
-    </TaskStyled>
-  );
+  const { userId } = useAuth();
+
+  useEffect(() => {
+    // @ts-ignore
+    dispatch(getTasks(userId));
+  }, [dispatch]);
+
+  // console.log(taskData);
+
+  return <TaskStyled theme={theme}>{/* <CreateContent /> */}</TaskStyled>;
 };
 
 const TaskStyled = styled.div`

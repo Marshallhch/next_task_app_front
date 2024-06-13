@@ -25,6 +25,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       {userId ? <RedirectToSignIn /> : null}
+
       <html lang="en">
         <head>
           <link
