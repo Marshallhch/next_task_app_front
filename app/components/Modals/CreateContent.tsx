@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useAuth } from '@clerk/nextjs';
 
@@ -18,6 +18,19 @@ const CreateContent = () => {
 
   const dispatch: Dispatch<any> = useDispatch(); // Explicitly type the dispatch function with 'Dispatch<any>'
   const taskData = useSelector((item: any) => item.apis.postTasksData);
+
+  useEffect(() => {
+    if (taskData === null) {
+      // taskData is null, do nothing
+      return;
+    }
+
+    if (taskData) {
+      toast.success('Task created successfully');
+    } else {
+      toast.error('Failed to create task');
+    }
+  }, [taskData]);
 
   const handleChange = (name: string) => (e: any) => {
     switch (name) {
