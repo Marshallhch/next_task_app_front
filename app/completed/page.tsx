@@ -1,9 +1,14 @@
-'use client';
-
 import React from 'react';
+import Tasks from '../components/Tasks/Tasks';
 
 const page = () => {
-  return <div>completed</div>;
+  return (
+    <Tasks
+      pageTitle="Completed Items"
+      filterCompleted={true}
+      isImportant={null}
+    />
+  );
 };
 
 export default page;

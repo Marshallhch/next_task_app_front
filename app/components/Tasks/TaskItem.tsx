@@ -1,7 +1,7 @@
 'use client';
 
 import { useGlobalState } from '@/app/context/globalProvider';
-import { edit, trash } from '@/app/utils/Icons';
+import { edit, trash, bell } from '@/app/utils/Icons';
 import styled from 'styled-components';
 import formatDate from '@/app/utils/formatDate';
 import { useAuth } from '@clerk/nextjs';
@@ -77,6 +77,12 @@ const TaskItem = ({ task }: Props) => {
             Incompleted
           </button>
         )}
+
+        {is_important ? (
+          <button className="important">{bell}</button>
+        ) : (
+          <button></button>
+        )}
         <button className="edit">{edit}</button>
         <button className="delete" onClick={deleteItem}>
           {trash}
@@ -123,7 +129,7 @@ const TaskItemStyled = styled.div`
     }
   }
 
-  .edit {
+  .important {
     margin-left: auto;
   }
 

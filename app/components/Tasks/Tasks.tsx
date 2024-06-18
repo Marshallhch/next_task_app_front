@@ -1,7 +1,7 @@
 'use client';
 
 import { useGlobalState } from '@/app/context/globalProvider';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { getTasks } from '../../redux/slices/apiSlice';
@@ -13,7 +13,15 @@ import { plus } from '@/app/utils/Icons';
 import CreateContent from '../Modals/CreateContent';
 import toast from 'react-hot-toast';
 
-const Tasks = ({ pageTitle }: { pageTitle: string }) => {
+const Tasks = ({
+  pageTitle,
+  filterCompleted,
+  isImportant,
+}: {
+  pageTitle: string;
+  filterCompleted?: boolean | null;
+  isImportant?: boolean | null;
+}) => {
   const { theme } = useGlobalState();
   const dispatch: Dispatch<any> = useDispatch(); // Explicitly type the dispatch function with 'Dispatch<any>'
   const taskData = useSelector((item: any) => item.apis.getTasksData);
@@ -21,6 +29,8 @@ const Tasks = ({ pageTitle }: { pageTitle: string }) => {
   const updateCompletedStatus = useSelector(
     (state: any) => state.apis.updateCompletedTaskData
   );
+
+  const prevUpdateCompletedStatus = useRef(updateCompletedStatus);
 
   const { userId } = useAuth();
 
@@ -32,12 +42,18 @@ const Tasks = ({ pageTitle }: { pageTitle: string }) => {
     }
   }, [status, dispatch, userId]);
 
+  // updateCompletedStatus 값이 null에서 non-null로 변경될 때만 useEffect 내의 코드가 실행. 이는 useEffect가 두 번 실행되는 문제를 해결.
   useEffect(() => {
-    if (updateCompletedStatus !== null) {
+    if (
+      prevUpdateCompletedStatus.current === null &&
+      updateCompletedStatus !== null
+    ) {
       toast.success('Task Updated Successfully');
       // @ts-ignore
       dispatch(getTasks(userId));
     }
+
+    prevUpdateCompletedStatus.current = updateCompletedStatus;
   }, [updateCompletedStatus, dispatch, userId]);
 
   useEffect(() => {
@@ -53,7 +69,14 @@ const Tasks = ({ pageTitle }: { pageTitle: string }) => {
       <h1>{pageTitle}</h1>
       <div className="tasks grid">
         {taskData &&
-          taskData.map((task: any) => <TaskItem key={task._id} task={task} />)}
+          taskData
+            .filter(
+              (task: any) =>
+                (filterCompleted === null ||
+                  task.is_completed === filterCompleted) &&
+                (isImportant === null || task.is_important === isImportant)
+            )
+            .map((task: any) => <TaskItem key={task._id} task={task} />)}
         <button className="create-task">
           {plus}
           Add New Task
