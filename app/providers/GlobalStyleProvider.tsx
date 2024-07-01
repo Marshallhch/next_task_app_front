@@ -17,6 +17,11 @@ const GlobalStyles = styled.div`
   gap: 1.25rem;
   height: 100%;
 
+  @media screen and (max-width: 1020px) {
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

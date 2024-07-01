@@ -65,6 +65,10 @@ const updateCompletedHandleFulfilled = (stateKey) => (state, action) => {
   state[stateKey] = Date.now();
 };
 
+const postTasksHandleFulfilled = (stateKey) => (state, action) => {
+  state[stateKey] = Date.now();
+};
+
 const handleRejected = (state, action) => {
   console.log('Error', action.payload);
   state.isError = true;
@@ -82,7 +86,7 @@ const apisSlice = createSlice({
     builder
       .addCase(getTasks.fulfilled, handleFulfilled('getTasksData'))
       .addCase(getTasks.rejected, handleRejected)
-      .addCase(postTasks.fulfilled, handleFulfilled('postTasksData'))
+      .addCase(postTasks.fulfilled, postTasksHandleFulfilled('postTasksData'))
       .addCase(postTasks.rejected, handleRejected)
       .addCase(deleteTask.fulfilled, delHandleFulfilled('deleteTaskData'))
       .addCase(deleteTask.rejected, handleRejected)

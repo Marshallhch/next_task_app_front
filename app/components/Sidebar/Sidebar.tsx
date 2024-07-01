@@ -9,15 +9,18 @@ import menu from '@/app/utils/menu';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Button from '../Button/Button';
-import { logout } from '@/app/utils/Icons';
-import { useClerk } from '@clerk/nextjs';
+import { arrowLeft, bars, logout } from '@/app/utils/Icons';
+import { UserButton, useClerk, useUser } from '@clerk/nextjs';
 
 const Sidebar = () => {
-  const { theme } = useGlobalState();
+  const { theme, collapsed, collapseMenu } = useGlobalState();
   const { signOut } = useClerk();
   const router = useRouter();
   const pathname = usePathname();
 
+  const user = useUser();
+
+  // console.log(user.user?.firstName);
   // console.log(pathname);
 
   const handleClick = (link: string) => {
@@ -25,15 +28,21 @@ const Sidebar = () => {
   };
 
   return (
-    <SidebarStyled theme={theme}>
+    <SidebarStyled theme={theme} $collapsed={collapsed}>
+      <button className="toggle-nav" onClick={collapseMenu}>
+        {collapsed ? bars : arrowLeft}
+      </button>
+
       <div className="profile">
         <div className="profile-overlay"></div>
-        <div className="image">
+        {/* <div className="image">
           <Image width={70} height={70} src="/avatar1.png" alt="profile" />
+        </div> */}
+        <div className="user-btn">
+          <UserButton afterSignOutUrl="/signin" />
         </div>
         <h1>
-          <span>Marshall</span>
-          <span>Han</span>
+          <span>{user.user?.fullName}</span>
         </h1>
       </div>
       <ul className="nav-items">
@@ -70,7 +79,7 @@ const Sidebar = () => {
   );
 };
 
-const SidebarStyled = styled.nav`
+const SidebarStyled = styled.nav<{ $collapsed: boolean }>`
   width: ${(props) => props.theme.sidebarWidth};
   position: relative;
   background: ${(props) => props.theme.colorBg2};
@@ -80,6 +89,54 @@ const SidebarStyled = styled.nav`
   flex-direction: column;
   justify-content: space-between;
   color: ${(props) => props.theme.colorGrey3};
+  z-index: 999;
+
+  .toggle-nav {
+    position: absolute;
+    right: -50px;
+    margin: 0;
+    border: 1px solid rgba(249, 249, 249, 0.08);
+    top: 5rem;
+    width: 50px;
+    padding: 1rem;
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+
+    background-color: ${(props) => props.theme.colorBg2};
+    display: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    position: fixed;
+    height: calc(100vh - 1rem);
+    transform: ${(props) =>
+      props.$collapsed ? 'translateX(-100%)' : 'translateX(0)'};
+    transition: all 0.3s cubic-bezier(0.53, 0.21, 0, 1);
+
+    .toggle-nav {
+      display: block;
+    }
+  }
+
+  .user-btn {
+    width: 35px;
+    height: 35px;
+
+    .cl-rootBox {
+      width: 100%;
+      height: 100%;
+
+      span {
+        width: 100%;
+        height: 100%;
+
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+  }
 
   .profile {
     margin: 0.75rem;
@@ -118,7 +175,7 @@ const SidebarStyled = styled.nav`
     > h1 {
       margin-left: 1rem;
       font-size: clamp(0.875rem, 4vw, 1rem); // clamp(최솟값, 선호값, 최댓값)
-      line-height: 100%;
+      line-height: 160%;
     }
 
     .image,

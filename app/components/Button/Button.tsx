@@ -17,6 +17,7 @@ interface Props {
   click?: () => void;
   type?: 'button' | 'submit' | 'reset' | undefined;
   border?: string;
+  color?: string;
 }
 
 const Button = ({
@@ -30,6 +31,7 @@ const Button = ({
   click,
   type,
   border,
+  color,
 }: Props) => {
   const { theme } = useGlobalState();
   const { signOut } = useClerk();
@@ -45,6 +47,7 @@ const Button = ({
         fontWeight: fw || '500',
         fontSize: fs,
         border: border || 'none',
+        color: color,
       }}
       theme={theme}
     >
@@ -75,7 +78,7 @@ const ButtonStyled = styled.button`
   &:hover {
     color: ${(props) => props.theme.colorGrey2};
     i {
-      color: ${(props) => props.theme.colorGrey2};
+      color: ${(props) => props.theme.colorGrey0};
     }
   }
 `;

@@ -1,12 +1,16 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useAuth } from '@clerk/nextjs';
 
 import { postTasks } from '../../redux/slices/apiSlice';
 import { Dispatch } from 'redux';
 import { useDispatch, useSelector } from 'react-redux';
+import styled from 'styled-components';
+import { useGlobalState } from '@/app/context/globalProvider';
+import Button from '../Button/Button';
+import { add } from '@/app/utils/Icons';
 
 const CreateContent = () => {
   const [title, setTitle] = useState('');
@@ -15,6 +19,8 @@ const CreateContent = () => {
   const [completed, setCompleted] = useState(false);
   const [important, setImportant] = useState(false);
   const { userId } = useAuth();
+
+  const { theme, closeModal } = useGlobalState();
 
   const dispatch: Dispatch<any> = useDispatch(); // Explicitly type the dispatch function with 'Dispatch<any>'
   const taskData = useSelector((item: any) => item.apis.postTasksData);
@@ -92,11 +98,12 @@ const CreateContent = () => {
 
     // @ts-ignore
     dispatch(postTasks(options));
+    closeModal();
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Create a Task{userId}</h1>
+    <CreateContentStyled onSubmit={handleSubmit} theme={theme}>
+      <h1>Create a Task</h1>
       <div className="input-control">
         <label htmlFor="title">Title</label>
         <input
@@ -135,7 +142,7 @@ const CreateContent = () => {
         />
       </div>
 
-      <div className="input-control">
+      <div className="input-control toggler">
         <label htmlFor="completed">Toggle Completed</label>
         <input
           type="checkbox"
@@ -147,7 +154,7 @@ const CreateContent = () => {
         />
       </div>
 
-      <div className="input-control">
+      <div className="input-control toggler">
         <label htmlFor="important">Toggle Important</label>
         <input
           type="checkbox"
@@ -159,13 +166,73 @@ const CreateContent = () => {
         />
       </div>
 
-      <div className="submit-btn">
-        <button type="submit">
-          <span>Submit</span>
-        </button>
+      <div className="submit-btn flex justify-end">
+        <Button
+          type="submit"
+          name="Create Task"
+          icon={add}
+          padding={'.5rem 1rem'}
+          border-radius={'0.25rem'}
+          fw={'500'}
+          fs={'0.875rem'}
+          color={theme.colorGrey1}
+          background={theme.colorGreenDark}
+        />
       </div>
-    </form>
+    </CreateContentStyled>
   );
 };
+
+const CreateContentStyled = styled.form`
+  > h1 {
+    font-size: clamp(1.2rem, 5vw, 1.4rem);
+    font-weight: 600;
+  }
+
+  color: ${(props) => props.theme.colorGrey1};
+
+  .input-control {
+    position: relative;
+    margin: 1.6rem 0;
+    font-weight: 500;
+
+    input,
+    textarea {
+      width: 100%;
+      border: none;
+      padding: 0.5rem;
+      resize: none;
+      background-color: ${(props) => props.theme.colorGreyDark};
+      color: ${(props) => props.theme.colorGrey2};
+      border-radius: 0.25rem;
+    }
+  }
+
+  .submit-btn button {
+    color: ${(props) => props.theme.colorGrey1};
+
+    i {
+      font-size: 0.875rem;
+    }
+
+    &:hover {
+      background: ${(props) => props.theme.colorPrimaryGreen} !important;
+    }
+  }
+
+  .toggler {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    label {
+      flex: 1;
+    }
+
+    input {
+      width: initial;
+    }
+  }
+`;
 
 export default CreateContent;

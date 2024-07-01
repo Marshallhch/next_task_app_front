@@ -43,7 +43,7 @@ const TaskItem = ({ task }: Props) => {
     }
 
     setIsCompleted(!is_completed);
-    console.log(_id);
+    // console.log(_id);
 
     const updateCompletedData = {
       id: _id,
@@ -69,7 +69,7 @@ const TaskItem = ({ task }: Props) => {
       <p className="date">{formatDate(date)}</p>
       <div className="task-footer">
         {is_completed ? (
-          <button className="completed" onClick={() => changeCompleted()}>
+          <button className="completed" onClick={changeCompleted}>
             Completed
           </button>
         ) : (

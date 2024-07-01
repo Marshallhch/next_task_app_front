@@ -12,6 +12,7 @@ import TaskItem from './TaskItem';
 import { plus } from '@/app/utils/Icons';
 import CreateContent from '../Modals/CreateContent';
 import toast from 'react-hot-toast';
+import Modal from '../Modals/Modal';
 
 const Tasks = ({
   pageTitle,
@@ -22,39 +23,55 @@ const Tasks = ({
   filterCompleted?: boolean | null;
   isImportant?: boolean | null;
 }) => {
-  const { theme } = useGlobalState();
+  const { theme, openModal, modal } = useGlobalState();
   const dispatch: Dispatch<any> = useDispatch(); // Explicitly type the dispatch function with 'Dispatch<any>'
   const taskData = useSelector((item: any) => item.apis.getTasksData);
   const status = useSelector((state: any) => state.apis.deleteTaskData);
+  const postTaskData = useSelector((state: any) => state.apis.postTasksData);
   const updateCompletedStatus = useSelector(
     (state: any) => state.apis.updateCompletedTaskData
   );
-
+  const prevDeleteTaskData = useRef(status);
+  const prevPostTaskData = useRef(postTaskData);
   const prevUpdateCompletedStatus = useRef(updateCompletedStatus);
-
   const { userId } = useAuth();
 
   useEffect(() => {
-    if (status !== null) {
-      toast.success('Task Deleted Successfully');
-      // @ts-ignore
-      dispatch(getTasks(userId));
+    if (prevDeleteTaskData.current !== status) {
+      prevDeleteTaskData.current = status;
+
+      if (prevDeleteTaskData !== null) {
+        // @ts-ignore
+        dispatch(getTasks(userId));
+        toast.success('Task Deleted Successfully');
+      }
     }
   }, [status, dispatch, userId]);
 
   // updateCompletedStatus 값이 null에서 non-null로 변경될 때만 useEffect 내의 코드가 실행. 이는 useEffect가 두 번 실행되는 문제를 해결.
   useEffect(() => {
-    if (
-      prevUpdateCompletedStatus.current === null &&
-      updateCompletedStatus !== null
-    ) {
-      toast.success('Task Updated Successfully');
-      // @ts-ignore
-      dispatch(getTasks(userId));
-    }
+    if (prevUpdateCompletedStatus.current !== updateCompletedStatus) {
+      prevUpdateCompletedStatus.current = updateCompletedStatus;
 
-    prevUpdateCompletedStatus.current = updateCompletedStatus;
+      if (updateCompletedStatus !== null) {
+        // @ts-ignore
+        dispatch(getTasks(userId));
+        toast.success('Task Updated Successfully');
+      }
+    }
   }, [updateCompletedStatus, dispatch, userId]);
+
+  useEffect(() => {
+    if (prevPostTaskData.current !== postTaskData) {
+      prevPostTaskData.current = postTaskData;
+
+      if (prevPostTaskData !== null) {
+        // @ts-ignore
+        dispatch(getTasks(userId));
+        toast.success('Task Posted Successfully');
+      }
+    }
+  }, [postTaskData]);
 
   useEffect(() => {
     // @ts-ignore
@@ -65,7 +82,7 @@ const Tasks = ({
 
   return (
     <TaskStyled theme={theme}>
-      <CreateContent />
+      {modal && <Modal content={<CreateContent />} />}
       <h1>{pageTitle}</h1>
       <div className="tasks grid">
         {taskData &&
@@ -77,7 +94,7 @@ const Tasks = ({
                 (isImportant === null || task.is_important === isImportant)
             )
             .map((task: any) => <TaskItem key={task._id} task={task} />)}
-        <button className="create-task">
+        <button className="create-task" onClick={openModal}>
           {plus}
           Add New Task
         </button>

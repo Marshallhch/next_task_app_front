@@ -10,9 +10,22 @@ export const GlobalUpdateContext = createContext();
 
 export const GlobalProvider = ({ children }) => {
   const [selectedTheme, setSelectedTheme] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
   const [tasks, setTasks] = useState([]);
   const theme = themes[selectedTheme];
+  const [modal, setModal] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+
+  const openModal = () => {
+    setModal(true);
+  };
+
+  const closeModal = () => {
+    setModal(false);
+  };
+
+  const collapseMenu = () => {
+    setCollapsed(!collapsed);
+  };
 
   return (
     <Provider store={store}>
@@ -20,6 +33,11 @@ export const GlobalProvider = ({ children }) => {
         value={{
           theme,
           tasks,
+          openModal,
+          closeModal,
+          modal,
+          collapsed,
+          collapseMenu,
         }}
       >
         <GlobalUpdateContext.Provider value={{}}>
